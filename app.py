@@ -9,14 +9,20 @@ import os
 app = Flask(__name__)
 app.config.from_object(Config)
 
-# Ensure instance directory exists
-os.makedirs('instance', exist_ok=True)
+# Ensure instance directory exists (only if not in serverless environment)
+if not os.environ.get('VERCEL'):
+    os.makedirs('instance', exist_ok=True)
 
 db.init_app(app)
 
-# Initialize database tables
-with app.app_context():
-    db.create_all()
+# Initialize database tables (with error handling for serverless)
+try:
+    with app.app_context():
+        db.create_all()
+except Exception as e:
+    print(f"Warning: Could not initialize database: {e}")
+    # In serverless, database might not be available
+    pass
 
 # Initialize API client
 api_client = RAWGClient()
