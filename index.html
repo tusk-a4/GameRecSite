@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Recommendation Site</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .view {
+            display: none;
+            padding: 40px;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-link {
+            background: none;
+            color: #667eea;
+            text-decoration: underline;
+            padding: 0;
+        }
+
+        .btn-link:hover {
+            color: #5568d3;
+        }
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .landing-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .landing-buttons .btn {
+            width: 100%;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .game-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+
+        .game-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .game-info {
+            padding: 15px;
+        }
+
+        .game-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .game-rating {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .game-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            max-height: 100px;
+            overflow: hidden;
+        }
+
+        .nav-bar {
+            background: #667eea;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-bar h3 {
+            color: white;
+            margin: 0;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .saved-list-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .saved-list-item h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .saved-list-item p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .view {
+                padding: 20px;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Bar -->
+        <div class="nav-bar" id="navBar" style="display: none;">
+            <h3>Game Recommendations</h3>
+            <div class="nav-links">
+                <a href="#" onclick="showView('survey'); return false;">New Search</a>
+                <a href="#" onclick="showView('myLists'); return false;">My Lists</a>
+                <span id="userInfo" style="color: white; margin-left: 15px;"></span>
+                <a href="#" onclick="logout(); return false;">Logout</a>
+            </div>
+        </div>
+
+        <!-- Landing Page -->
+        <div id="landingView" class="view active">
+            <h1>Welcome to Game Recommendations</h1>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Discover your next favorite game based on your preferences
+            </p>
+            <div class="landing-buttons">
+                <button class="btn btn-primary" onclick="showView('login')">Login</button>
+                <button class="btn btn-primary" onclick="showView('signup')">Sign Up</button>
+                <button class="btn btn-secondary" onclick="loginAsGuest()">Continue as Guest</button>
+            </div>
+        </div>
+
+        <!-- Login View -->
+        <div id="loginView" class="view">
+            <h1>Login</h1>
+            <div id="loginAlert"></div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    <button type="button" class="btn btn-secondary" onclick="showView('landing')">Back</button>
+                </div>
+            </form>
+            <p style="text-align: center; margin-top: 15px;">
+                Don't have an account? <a href="#" class="btn-link" onclick="showView('signup'); return false;">Sign up</a>
+            </p>
+        </div>
+
+        <!-- Signup View -->
+        <div id="signupView" class="view">
+            <h1>Sign Up</h1>
+            <div id="signupAlert"></div>
+            <form id="signupForm" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label for="signupUsername">Username</label>
+                    <input type="text" id="signupUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                    <button type="button" class="btn btn-secondary" onclick="showView('landing')">Back</button>
+                </div>
+            </form>
+            <p style="text-align: center; margin-top: 15px;">
+                Already have an account? <a href="#" class="btn-link" onclick="showView('login'); return false;">Login</a>
+            </p>
+        </div>
+
+        <!-- Survey View -->
+        <div id="surveyView" class="view">
+            <h1>Game Recommendation Survey</h1>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                Select your preferred platform and genre to get personalized game recommendations
+            </p>
+            <div id="surveyAlert"></div>
+            <form id="surveyForm" onsubmit="handleSurvey(event)">
+                <div class="form-group">
+                    <label for="platform">Platform</label>
+                    <select id="platform" required>
+                        <option value="">Select a platform</option>
+                        <option value="Steam">Steam</option>
+                        <option value="Xbox Series X|S">Xbox Series X|S</option>
+                        <option value="PlayStation 5">PlayStation 5</option>
+                        <option value="Nintendo Switch">Nintendo Switch</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="genre">Genre</label>
+                    <select id="genre" required>
+                        <option value="">Select a genre</option>
+                        <option value="RPG">RPG</option>
+                        <option value="Shooter">Shooter</option>
+                        <option value="Platformer">Platformer</option>
+                        <option value="Metroidvania">Metroidvania</option>
+                        <option value="Action">Action</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Get Recommendations</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results View -->
+        <div id="resultsView" class="view">
+            <h1>Game Recommendations</h1>
+            <div id="resultsInfo" style="text-align: center; color: #666; margin-bottom: 20px;"></div>
+            <div id="resultsAlert"></div>
+            <div id="resultsLoading" class="loading" style="display: none;">
+                Loading games...
+            </div>
+            <div id="gamesContainer" class="games-grid"></div>
+            <div class="form-actions" style="margin-top: 30px;">
+                <button class="btn btn-secondary" onclick="showView('survey')">New Search</button>
+            </div>
+        </div>
+
+        <!-- My Lists View -->
+        <div id="myListsView" class="view">
+            <h1>My Saved Lists</h1>
+            <div id="myListsAlert"></div>
+            <div id="savedListsContainer"></div>
+            <div class="form-actions" style="margin-top: 30px;">
+                <button class="btn btn-secondary" onclick="showView('survey')">New Search</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            RAWG_API_KEY: '424a594339fa4a868c839c8d46dc0b9d', // User will need to set this - should be your actual API key string
+            RAWG_API_BASE_URL: 'https://api.rawg.io/api',
+            PLATFORM_MAP: {
+                'Steam': 4,
+                'Xbox Series X|S': 186,
+                'PlayStation 5': 187,
+                'Nintendo Switch': 7
+            },
+            GENRE_MAP: {
+                'RPG': 'role-playing-games-rpg',
+                'Shooter': 'shooter',
+                'Platformer': 'platformer',
+                'Metroidvania': 'metroidvania',
+                'Action': 'action'
+            }
+        };
+
+        // Load API key from storage if available (do this first)
+        const storedApiKey = localStorage.getItem('rawg_api_key');
+        if (storedApiKey && storedApiKey.trim() && !storedApiKey.startsWith('http')) {
+            CONFIG.RAWG_API_KEY = storedApiKey;
+        } else if (storedApiKey && storedApiKey.startsWith('http')) {
+            // Clear invalid API key (URL) from storage
+            localStorage.removeItem('rawg_api_key');
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+            // Prompt for API key if not set or if it looks invalid (starts with http)
+            if (!CONFIG.RAWG_API_KEY || CONFIG.RAWG_API_KEY.startsWith('http')) {
+                const apiKey = prompt('Please enter your RAWG API key (get one from https://rawg.io/apidocs):');
+                if (apiKey && apiKey.trim() && !apiKey.startsWith('http')) {
+                    CONFIG.RAWG_API_KEY = apiKey.trim();
+                    localStorage.setItem('rawg_api_key', CONFIG.RAWG_API_KEY);
+                } else if (apiKey && apiKey.startsWith('http')) {
+                    alert('That looks like a URL, not an API key. Please enter your actual RAWG API key.');
+                }
+            }
+        });
+
+        // ==================== Storage Functions ====================
+
+        function getUsers() {
+            const users = localStorage.getItem('users');
+            return users ? JSON.parse(users) : [];
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        function getGamesCache() {
+            const cache = localStorage.getItem('games_cache');
+            return cache ? JSON.parse(cache) : {};
+        }
+
+        function saveGamesCache(cache) {
+            localStorage.setItem('games_cache', JSON.stringify(cache));
+        }
+
+        function getSavedLists(username) {
+            const key = `saved_lists_${username}`;
+            const lists = localStorage.getItem(key);
+            return lists ? JSON.parse(lists) : [];
+        }
+
+        function saveSavedLists(username, lists) {
+            const key = `saved_lists_${username}`;
+            localStorage.setItem(key, JSON.stringify(lists));
+        }
+
+        function getCurrentUser() {
+            return sessionStorage.getItem('current_user');
+        }
+
+        function setCurrentUser(username) {
+            sessionStorage.setItem('current_user', username);
+        }
+
+        function clearCurrentUser() {
+            sessionStorage.removeItem('current_user');
+        }
+
+        // ==================== Password Hashing ====================
+
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hash))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        async function verifyPassword(password, hash) {
+            const passwordHash = await hashPassword(password);
+            return passwordHash === hash;
+        }
+
+        // ==================== View Navigation ====================
+
+        function showView(viewName) {
+            // Hide all views
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+
+            // Show requested view
+            const view = document.getElementById(viewName + 'View');
+            if (view) {
+                view.classList.add('active');
+            }
+
+            // Show/hide navigation bar
+            const navBar = document.getElementById('navBar');
+            if (viewName === 'landing' || viewName === 'login' || viewName === 'signup') {
+                navBar.style.display = 'none';
+            } else {
+                navBar.style.display = 'flex';
+                updateUserInfo();
+            }
+
+            // Special handling for my lists
+            if (viewName === 'myLists') {
+                loadSavedLists();
+            }
+        }
+
+        function updateUserInfo() {
+            const currentUser = getCurrentUser();
+            const userInfo = document.getElementById('userInfo');
+            if (currentUser) {
+                userInfo.textContent = `Logged in as: ${currentUser}`;
+            } else {
+                userInfo.textContent = 'Guest';
+            }
+        }
+
+        // ==================== Authentication ====================
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const alertDiv = document.getElementById('loginAlert');
+
+            if (!username || !password) {
+                showAlert(alertDiv, 'Please provide both username and password', 'error');
+                return;
+            }
+
+            const users = getUsers();
+            const user = users.find(u => u.username === username);
+
+            if (user && await verifyPassword(password, user.passwordHash)) {
+                setCurrentUser(username);
+                showAlert(alertDiv, 'Login successful!', 'success');
+                setTimeout(() => {
+                    showView('survey');
+                }, 500);
+            } else {
+                showAlert(alertDiv, 'Invalid username or password', 'error');
+            }
+        }
+
+        async function handleSignup(event) {
+            event.preventDefault();
+            const username = document.getElementById('signupUsername').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const alertDiv = document.getElementById('signupAlert');
+
+            if (!username || !password) {
+                showAlert(alertDiv, 'Please provide both username and password', 'error');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showAlert(alertDiv, 'Passwords do not match', 'error');
+                return;
+            }
+
+            const users = getUsers();
+            if (users.find(u => u.username === username)) {
+                showAlert(alertDiv, 'Username already exists', 'error');
+                return;
+            }
+
+            const passwordHash = await hashPassword(password);
+            users.push({ username, passwordHash });
+            saveUsers(users);
+
+            showAlert(alertDiv, 'Account created successfully! Please login.', 'success');
+            setTimeout(() => {
+                showView('login');
+            }, 1500);
+        }
+
+        function logout() {
+            clearCurrentUser();
+            showView('landing');
+        }
+
+        function loginAsGuest() {
+            clearCurrentUser();
+            showView('survey');
+        }
+
+        function checkAuthStatus() {
+            const currentUser = getCurrentUser();
+            if (currentUser) {
+                showView('survey');
+            }
+        }
+
+        // ==================== API Client ====================
+
+        async function getMetroidvaniaTagId() {
+            // Try to fetch the Metroidvania tag ID from RAWG API
+            try {
+                const tagsUrl = `${CONFIG.RAWG_API_BASE_URL}/tags?key=${CONFIG.RAWG_API_KEY}&search=metroidvania`;
+                const response = await fetch(tagsUrl);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.results && data.results.length > 0) {
+                        const metroidvaniaTag = data.results.find(tag => 
+                            tag.slug === 'metroidvania' || 
+                            tag.name.toLowerCase().includes('metroidvania')
+                        );
+                        if (metroidvaniaTag) {
+                            console.log('Found Metroidvania tag ID:', metroidvaniaTag.id);
+                            return metroidvaniaTag.id;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('Could not fetch Metroidvania tag ID:', error);
+            }
+            // Fallback to known tag ID
+            return 31;
+        }
+
+        async function fetchGamesFromAPI(platform, genre, pageSize = 20) {
+            if (!CONFIG.RAWG_API_KEY || CONFIG.RAWG_API_KEY.trim() === '' || CONFIG.RAWG_API_KEY.startsWith('http')) {
+                throw new Error('RAWG API key not configured. Please enter a valid API key.');
+            }
+
+            const platformId = CONFIG.PLATFORM_MAP[platform];
+            const genreSlug = CONFIG.GENRE_MAP[genre];
+
+            if (!platformId) {
+                return [];
+            }
+
+            const params = new URLSearchParams({
+                key: CONFIG.RAWG_API_KEY,
+                platforms: platformId,
+                page_size: pageSize,
+                ordering: '-rating'
+            });
+
+            // Metroidvania is a tag, not a genre in RAWG API
+            if (genre === 'Metroidvania') {
+                // RAWG API uses tag IDs, not slugs
+                const tagId = await getMetroidvaniaTagId();
+                params.append('tags', tagId.toString());
+                console.log(`Using tags parameter for Metroidvania (tag ID: ${tagId})`);
+            } else if (genreSlug) {
+                params.append('genres', genreSlug);
+            } else {
+                return [];
+            }
+
+            try {
+                const url = `${CONFIG.RAWG_API_BASE_URL}/games?${params}`;
+                console.log('Fetching games from:', url);
+                const response = await fetch(url);
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('API Error:', response.status, errorData);
+                    if (response.status === 401 || response.status === 403) {
+                        throw new Error('Invalid API key. Please check your RAWG API key.');
+                    }
+                    throw new Error(`API request failed: ${response.status} - ${errorData.detail || response.statusText}`);
+                }
+                const data = await response.json();
+                console.log('API Response:', data);
+
+                // If Metroidvania tag search returns no results, try action-adventure genre as fallback
+                if ((!data.results || data.results.length === 0) && genre === 'Metroidvania') {
+                    console.log('No results with Metroidvania tag, trying action-adventure genre as fallback');
+                    const fallbackParams = new URLSearchParams({
+                        key: CONFIG.RAWG_API_KEY,
+                        platforms: platformId,
+                        genres: 'action-adventure',
+                        page_size: pageSize,
+                        ordering: '-rating'
+                    });
+                    const fallbackUrl = `${CONFIG.RAWG_API_BASE_URL}/games?${fallbackParams}`;
+                    console.log('Trying fallback URL:', fallbackUrl);
+                    const fallbackResponse = await fetch(fallbackUrl);
+                    if (fallbackResponse.ok) {
+                        const fallbackData = await fallbackResponse.json();
+                        if (fallbackData.results && fallbackData.results.length > 0) {
+                            console.log(`Found ${fallbackData.results.length} games with fallback`);
+                            // Filter for games that might be Metroidvania-like (you could enhance this)
+                            data.results = fallbackData.results.slice(0, pageSize);
+                        }
+                    }
+                }
+
+                if (!data.results || data.results.length === 0) {
+                    console.warn('No results in API response');
+                    return [];
+                }
+
+                console.log(`Found ${data.results.length} games`);
+                return data.results.map(gameData => {
+                    let rating = gameData.rating ? gameData.rating * 20 : 0;
+                    if (gameData.metacritic) {
+                        rating = gameData.metacritic;
+                    }
+
+                    return {
+                        rawg_id: gameData.id,
+                        title: gameData.name || 'Unknown',
+                        platform: platform,
+                        genre: genre,
+                        rating: rating,
+                        image_url: gameData.background_image || '',
+                        description: (gameData.description_raw || '').substring(0, 500)
+                    };
+                });
+            } catch (error) {
+                console.error('API request failed:', error);
+                throw error;
+            }
+        }
+
+        function getCachedGames(platform, genre, limit = 20) {
+            const cache = getGamesCache();
+            const key = `${platform}-${genre}`;
+            const games = cache[key] || [];
+            return games
+                .sort((a, b) => b.rating - a.rating)
+                .slice(0, limit);
+        }
+
+        function cacheGames(games, platform, genre) {
+            const cache = getGamesCache();
+            const key = `${platform}-${genre}`;
+            const existingGames = cache[key] || [];
+            const existingIds = new Set(existingGames.map(g => g.rawg_id));
+
+            // Add new games, avoiding duplicates
+            games.forEach(game => {
+                if (!existingIds.has(game.rawg_id)) {
+                    existingGames.push(game);
+                }
+            });
+
+            cache[key] = existingGames;
+            saveGamesCache(cache);
+        }
+
+        async function getGames(platform, genre) {
+            // Try cached games first
+            let games = getCachedGames(platform, genre, 20);
+
+            // If not enough cached games, fetch from API
+            if (games.length < 10) {
+                // Check if API key is valid
+                if (!CONFIG.RAWG_API_KEY || CONFIG.RAWG_API_KEY.trim() === '' || CONFIG.RAWG_API_KEY.startsWith('http')) {
+                    // Return cached games if any, otherwise throw error
+                    if (games.length === 0) {
+                        throw new Error('No API key configured and no cached games available. Please enter a valid RAWG API key.');
+                    }
+                    return games;
+                }
+
+                try {
+                    const apiGames = await fetchGamesFromAPI(platform, genre, 20);
+                    if (apiGames.length > 0) {
+                        cacheGames(apiGames, platform, genre);
+                        // Merge with cached games, avoiding duplicates
+                        const existingIds = new Set(games.map(g => g.rawg_id));
+                        apiGames.forEach(game => {
+                            if (!existingIds.has(game.rawg_id)) {
+                                games.push(game);
+                            }
+                        });
+                        // Sort by rating and limit to 20
+                        games = games
+                            .sort((a, b) => b.rating - a.rating)
+                            .slice(0, 20);
+                    }
+                } catch (error) {
+                    console.error('Error fetching games from API:', error);
+                    // If we have cached games, use them; otherwise throw the error
+                    if (games.length === 0) {
+                        console.error('No cached games available, throwing error');
+                        throw error;
+                    } else {
+                        console.log(`Using ${games.length} cached games due to API error`);
+                    }
+                }
+            }
+
+            return games;
+        }
+
+        // ==================== Survey and Results ====================
+
+        async function handleSurvey(event) {
+            event.preventDefault();
+            const platform = document.getElementById('platform').value;
+            const genre = document.getElementById('genre').value;
+            const alertDiv = document.getElementById('surveyAlert');
+
+            if (!platform || !genre) {
+                showAlert(alertDiv, 'Please select both platform and genre', 'error');
+                return;
+            }
+
+            // Save search
+            const currentUser = getCurrentUser();
+            if (currentUser) {
+                const savedLists = getSavedLists(currentUser);
+                savedLists.push({
+                    platform: platform,
+                    genre: genre,
+                    timestamp: new Date().toISOString()
+                });
+                saveSavedLists(currentUser, savedLists);
+            }
+
+            // Show results view and load games
+            showView('results');
+            displayResults(platform, genre);
+        }
+
+        async function displayResults(platform, genre) {
+            const resultsInfo = document.getElementById('resultsInfo');
+            const gamesContainer = document.getElementById('gamesContainer');
+            const resultsLoading = document.getElementById('resultsLoading');
+            const resultsAlert = document.getElementById('resultsAlert');
+
+            resultsInfo.textContent = `Platform: ${platform} | Genre: ${genre}`;
+            gamesContainer.innerHTML = '';
+            resultsLoading.style.display = 'block';
+
+            try {
+                const games = await getGames(platform, genre);
+                console.log(`Retrieved ${games.length} games for ${platform} - ${genre}`);
+
+                resultsLoading.style.display = 'none';
+
+                if (games.length === 0) {
+                    showAlert(resultsAlert, 'No games found. Please try different criteria. Check the browser console (F12) for details.', 'error');
+                    return;
+                }
+
+                gamesContainer.innerHTML = games.map(game => `
+                    <div class="game-card">
+                        ${game.image_url ? `<img src="${game.image_url}" alt="${game.title}" class="game-image" onerror="this.style.display='none'">` : ''}
+                        <div class="game-info">
+                            <div class="game-title">${escapeHtml(game.title)}</div>
+                            <div class="game-rating">Rating: ${game.rating.toFixed(1)}/100</div>
+                            ${game.description ? `<div class="game-description">${escapeHtml(game.description)}</div>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                resultsLoading.style.display = 'none';
+                showAlert(resultsAlert, `Error loading games: ${error.message}`, 'error');
+            }
+        }
+
+        // ==================== Saved Lists ====================
+
+        function loadSavedLists() {
+            const currentUser = getCurrentUser();
+            const container = document.getElementById('savedListsContainer');
+            const alertDiv = document.getElementById('myListsAlert');
+
+            if (!currentUser) {
+                showAlert(alertDiv, 'Please login to view your lists', 'error');
+                container.innerHTML = '';
+                return;
+            }
+
+            const savedLists = getSavedLists(currentUser);
+
+            if (savedLists.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">No saved lists yet. Start searching to save your recommendations!</p>';
+                return;
+            }
+
+            container.innerHTML = savedLists
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                .map(list => {
+                    const date = new Date(list.timestamp);
+                    return `
+                        <div class="saved-list-item">
+                            <h4>${escapeHtml(list.platform)} - ${escapeHtml(list.genre)}</h4>
+                            <p>Saved on ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}</p>
+                            <button class="btn btn-primary" style="margin-top: 10px;" onclick="viewSavedList('${escapeHtml(list.platform)}', '${escapeHtml(list.genre)}')">View Recommendations</button>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        function viewSavedList(platform, genre) {
+            showView('results');
+            displayResults(platform, genre);
+        }
+
+        // ==================== Utility Functions ====================
+
+        function showAlert(container, message, type) {
+            container.innerHTML = `<div class="alert alert-${type}">${escapeHtml(message)}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
+
